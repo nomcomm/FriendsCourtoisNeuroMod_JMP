@@ -2,7 +2,7 @@
 verify_claims.py — print every number the manuscript quotes, in one place.
 =========================================================================
 Reads only the pipeline's own outputs under data/ and prints the headline values
-cited in ../MANUSCRIPT/{revision_draft,revision_supplement,results_register}.md,
+cited in the paper and its supplement,
 grouped by register block. Nothing is recomputed here: this is a read-out, so a
 number that appears in the paper but not below has no reproducible source.
 

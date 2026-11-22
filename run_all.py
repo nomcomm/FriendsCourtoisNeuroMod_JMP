@@ -21,7 +21,7 @@ SCRIPTS = Path(__file__).resolve().parent / "scripts"
 
 # ---------------------------------------------------------------------------
 # THE PIPELINE. Each entry is a script path relative to scripts/.
-# Grouped by block; blocks map 1:1 to ../MANUSCRIPT/results_register.md.
+# Grouped by block; blocks map 1:1 to the parts of the paper (A, B, C).
 # ---------------------------------------------------------------------------
 
 STAGES = [

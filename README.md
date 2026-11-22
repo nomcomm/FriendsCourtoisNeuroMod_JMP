@@ -1,12 +1,13 @@
-# Friends fMRI — Reproducible Analysis & Figure Package (CODE)
+# Friends fMRI — Reproducible Analysis & Figure Package
 
-Self-contained package that **reproduces every result and figure** in the revised
-manuscript. It runs locally with no external drive needed for the analysis or figures;
-the raw source data is archived on the external T7 drive and only matters for optional
+Analysis code for: Schmälzle, R., & Sondhi, M. (2026). The One Where The Brains Sync:
+Audience Synchronization and Laughter-Associated Modulation Across Six Seasons of
+*Friends*. *Journal of Media Psychology*. https://doi.org/10.1027/1864-1105/a000529
+
+Self-contained package that **reproduces every result and figure** in the paper. The
+analysis and figures run from the files in this repository alone; the raw source data
+(CNeuroMod BOLD, stimulus audio) is not included and only matters for an optional
 from-raw re-derivation (see below).
-
-Sibling folder `../MANUSCRIPT/` holds the paper (`revision_draft.md`,
-`revision_supplement.md`, `response_to_reviewers.md`, `results_register.md`).
 
 ## Principle
 
@@ -35,7 +36,8 @@ figures/             THE paper figures — assembles panels into figure1–3 + f
 
 Note the two distinct roles: `results/analysis_plots/` are pipeline byproducts; `figures/`
 is where the **paper** figures are made (it stages a curated subset of the analysis plots
-and composes the final figures). The blocks map 1:1 to `../MANUSCRIPT/results_register.md`.
+and composes the final figures). The blocks map 1:1 to the parts of
+the paper (A: ISC stability, B: laughter modulation, C: control analyses).
 
 ## How to run
 
@@ -66,20 +68,21 @@ from those carried intermediates:
 | stage | cost | needs |
 |---|---|---|
 | `a_*`, `b_*` (parcel GLM/ISC/striatum/dose/season/av-energy/humor-type), `c_*` controls | **seconds–minutes** | only carried inputs — cheap, deterministic |
-| `0_prep/extract_timeseries` | ~1.5 TB, hours | T7 + CONP mirror (timeseries carried → normal run skips) |
-| `0_prep/predict_laughter` | minutes | T7 audio (model + annotations carried → skips) |
+| `0_prep/extract_timeseries` | ~1.5 TB, hours | raw BOLD from the CONP mirror, not included (timeseries carried → normal run skips) |
+| `0_prep/predict_laughter` | minutes | stimulus audio, not included (model + annotations carried → skips) |
 | `humor_classification` | LLM API | Gemini key (per-TR labels carried → skips) |
-| `glm_contrast_voxelwise.py` | hours, ~1.5 TB read | T7 BOLD; **not in `run_all`** — heavy voxelwise step. Its *result* (`data/b_laughter/glm_voxelwise/group_tmap*.nii.gz`) is carried locally and feeds Figure S1; only the per-voxel `betas`/`betas_motion` (symlinked → T7) are external. |
+| `glm_contrast_voxelwise.py` | hours, ~1.5 TB read | raw BOLD, not included; **not in `run_all`** — heavy voxelwise step. Its *result* (`data/b_laughter/glm_voxelwise/group_tmap*.nii.gz`) is carried here and feeds Figure S1; only the per-voxel `betas`/`betas_motion` are external. |
 
-## Raw sources (archived on T7)
+## Raw sources (not included)
 
-To keep the local project lean, the raw source folders are archived on the external drive
-at `/Volumes/T7 Shield/friends/paper_OLD/` (`01_ORIGINAL_GITHUB`, `02_CNEUROMOD_RAW`, the
-old `03_REVISION*` folders, etc.). `config.py` points `ORIGINAL_DIR` / `CNEUROMOD_DIR` /
-`CONFOUNDS_DIR` there. **The analysis and figures never touch them** — they run from the
-bundled `assets/` and the carried `data/`. T7 is needed only for a from-raw re-derivation
-(e.g., `head_motion.py --force` reads the confounds; `head_motion.py --plot-only`
-reproduces the control from the carried result with no T7).
+The raw source data (CNeuroMod fMRIPrep BOLD and confounds, the stimulus audio/video, and
+the files of the original submission) is too large to distribute here and is kept on
+external storage. `config.py` points `ORIGINAL_DIR` / `CNEUROMOD_DIR` / `CONFOUNDS_DIR`
+(and the stimulus/BIDS roots) to that storage; set these paths to your own copy of the
+CNeuroMod *Friends* dataset for a from-raw re-derivation. **The analysis and figures never
+touch them** — they run from the bundled `assets/` and the carried `data/` (e.g.,
+`head_motion.py --force` reads the raw confounds; `head_motion.py --plot-only` reproduces
+the control from the carried result without them).
 
 ## Inherited numbers (not regenerated here)
 
@@ -101,8 +104,8 @@ H5 *spatial stability* (0.867 ± 0.030) was on that list until
 
 - Rebuilding `data/` fully from raw is **not** one command (the carry-over was done once,
   per-folder `PROVENANCE.txt`); the reproducible unit is analysis + figures from carried data.
-- **AppleDouble hazard:** the T7 drive is exFAT and accrues `._` files; any script that
-  `pathlib.glob("*.npy")` over a T7 path must skip names starting with `._`
+- **AppleDouble hazard:** an exFAT external drive accrues `._` files; any script that
+  `pathlib.glob("*.npy")` over such a path must skip names starting with `._`
   (already handled in `glm_contrast_voxelwise.py`).
 - `config.EXCLUDED_EPISODES` vs. per-episode coverage: a mismatch was flagged in
   `qc_coverage.py` and left as-is (does not affect the reported analyses).
